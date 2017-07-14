@@ -1,0 +1,10 @@
+demo/
+tmp/
+node_modules/
+log/
+spec/
+plato/
+coverage/
+.vagrant/
+.nyc_output
+.git
