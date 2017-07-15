@@ -39,6 +39,36 @@ describe('fauxdash', function () {
       _.flatten([1, [2, 3], [4]]).should.eql([1, 2, 3, 4])
       _.flatten([1, [2, [3]], [4], [[[5, 6, 7]]]]).should.eql([1, 2, 3, 4, 5, 6, 7])
     })
+
+    it('should find intersections correctly', function () {
+      _.intersection([1,7,4,6,2,3,5,9],[8,6,4,2]).should.eql([4,6,2])
+      _.intersection(
+        [,,,,'a',1,,,,1,1,1,1,'b',,,,,2,3,4,true,true,true,,,,,'c'],
+        ['a','b','c']
+      ).should.eql(['a','b','c'])
+    })
+
+    it('should get last', function() {
+      expect(_.last(undefined)).to.equal(undefined)
+      expect(_.last([])).to.equal(undefined)
+      _.last([1]).should.equal(1)
+      _.last([1,2,3,4,5]).should.equal(5)
+    })
+
+    it('should eliminate duplicates', function() {
+      _.uniq([1,2,3,4,1,2,3,1,5,6,7,8,1,1,1,2,6,5,3,3,5,1,1,4,5,1,8,9,7,6,2,3,2,1,4])
+        .should.eql([1,2,3,4,5,6,7,8,9])
+      _.uniq(['alice','bob','clarice','dan','erica','frank','alice','erica','dan','felicia','dan','frank'])
+        .should.eql(['alice','bob','clarice','dan','erica','frank','felicia'])
+    })
+
+    it('should apply without correctly', function () {
+      _.without([1,7,4,6,2,3,5,9],[8,6,4,2]).should.eql([1,7,3,5,9])
+      _.without(
+        [,,,,'a',1,,,,1,1,1,1,'b',,,,,2,3,4,true,true,true,,,,,'c'],
+        ['a','b','c']
+      ).should.eql([1,2,3,4,true])
+    })
   })
 
   describe('Is', function () {
@@ -99,17 +129,17 @@ describe('fauxdash', function () {
 
     it('should parse function correctly', function () {
       _.parseFunction(function one (a, b, c) {})
-        .should.eql({ name: 'one', arguments: ['a', 'b', 'c'], body: undefined })
+        .should.partiallyEql({ name: 'one', arguments: ['a', 'b', 'c'] })
     })
 
     it('should parse function correctly', function () {
       _.parseFunction((a, b) => {})
-        .should.eql({ name: undefined, arguments: ['a', 'b'], body: undefined })
+        .should.partiallyEql({ name: undefined, arguments: ['a', 'b'] })
     })
 
     it('should parse function correctly', function () {
       _.parseFunction(a => {})
-        .should.eql({ name: undefined, arguments: ['a'], body: undefined })
+        .should.partiallyEql({ name: undefined, arguments: ['a'] })
     })
   })
 
@@ -136,6 +166,50 @@ describe('fauxdash', function () {
 
     it('should resolved on successful function', function () {
       return lifted(100).should.eventually.equal(100)
+    })
+  })
+
+  describe('Object iterators', function () {
+    it('should iterate on object key/values', function() {
+      const keys = []
+      const values = []
+      _.each({a: 1, b: 2, c: 3}, (v, k) => {
+        keys.push(k)
+        values.push(v)
+      })
+      keys.should.eql(['a','b','c'])
+      values.should.eql([1,2,3])
+    })
+
+    it('should map on object key/values', function() {
+      _.map({a: 1, b: 2, c: 3}, (v, k) => `${k}:${v}`)
+        .should.eql(['a:1','b:2','c:3'])
+    })
+
+    it('should reduce on object key/values', function() {
+      _.reduce({a: 1, b: 2, c: 3}, (acc, v) => acc += v, 0)
+        .should.equal(6)
+      _.reduce({a: 1, b: 2, c: 3}, (acc, v, k) =>
+        acc += `${k}=>${v}`
+      , '').should.equal('a=>1b=>2c=>3')
+    })
+
+    it('should get values from object keys', function () {
+      _.values({a: 1, b: 2, c: 'test', d: true}).should.eql(
+        [1, 2, 'test', true]
+      )
+    })
+
+    it('should get valid matches function', function() {
+      const m1 = _.matches({a: 1, b: 2, c: 3})
+      const m2 = _.matches({a: true, b: 'string', c: { d: 1 }})
+      m1({a: 1, b: 2, c: 3}).should.equal(true)
+      m1({a: 2, b: 2, c: 3}).should.equal(false)
+      m1({a: 1, b: 1, c: 3}).should.equal(false)
+      m1({a: 1, b: 2, c: 2}).should.equal(false)
+
+      m2({a: true, b: 'string', c: { d: 1 }}).should.equal(true)
+      m2({a: true, b: 'string', c: { d: 2 }}).should.equal(false)
     })
   })
 })

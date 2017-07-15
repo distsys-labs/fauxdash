@@ -65,6 +65,10 @@ function contains (list, value) {
   return list.indexOf(value) >= 0
 }
 
+function each (obj, fn) {
+  return Object.keys(obj).forEach(k => fn(obj[k], k))
+}
+
 function filter (list, predicate = y => y) {
   return list.reduce((acc, x) => predicate(x) ? acc.concat(x) : acc, [])
 }
@@ -103,8 +107,30 @@ function getObjectTag (value) {
   return Object.prototype.toString.call(value)
 }
 
+function intersection (a, b) {
+  const a1 = uniq(filter(a))
+  const b1 = uniq(filter(b))
+  return a1.reduce((acc, x) => {
+    if (contains(b1, x)) {
+      acc.push(x)
+    }
+    return acc
+  }, [])
+}
+
 function isDate (value) {
   return getObjectTag(value) === DATE_TAG
+}
+
+function isEqual (a, b) {
+  if (isObject(a) && isObject(b)) {
+    return reduce(a, (acc, v, k) => acc && isEqual(v, b[k]), true)
+  } else if (Array.isArray(a) && Array.isArray(b)) {
+    return a.length === b.length &&
+      a.reduce((acc, x, i) => acc && isEqual(x, b[i]), true)
+  } else {
+    return a === b
+  }
 }
 
 function isFunction (value) {
@@ -139,6 +165,10 @@ function isString (value) {
     (!Array.isArray(value) && getObjectTag(value) === STRING_TAG)
 }
 
+function last (list) {
+  return list && list.length >= 0 ? list[list.length - 1] : undefined
+}
+
 function lift (asyncFn) {
   const lifted = function (...params) {
     return new Promise((resolve, reject) => {
@@ -156,6 +186,16 @@ function lift (asyncFn) {
   return lifted
 }
 
+function map (obj, fn) {
+  return Object.keys(obj).map(k => fn(obj[k], k))
+}
+
+function matches (filter) {
+  return isEqual.bind(null, filter)
+}
+
+function noop () {}
+
 function parseFunction (fn) {
   const parts = FUNCTION_REGEX.exec(fn.toString())
   return {
@@ -165,6 +205,13 @@ function parseFunction (fn) {
       .split(',')),
     body: parts[ 4 ]
   }
+}
+
+function reduce (obj, fn, acc) {
+  Object.keys(obj).forEach(k => {
+    acc = fn(acc, obj[k], k)
+  })
+  return acc
 }
 
 function trimString (str) {
@@ -179,17 +226,44 @@ function type (obj) {
   return Object.prototype.toString.call(obj)
 }
 
+function uniq (original) {
+  return original.reduce((acc, x) => {
+    if (!contains(acc, x)) {
+      acc.push(x)
+    }
+    return acc
+  }, [])
+}
+
+function values (obj) {
+  return Object.keys(obj).map(k => obj[k])
+}
+
+function without (a, b) {
+  const a1 = uniq(filter(a))
+  const b1 = uniq(filter(b))
+  return a1.reduce((acc, x) => {
+    if (!contains(b1, x)) {
+      acc.push(x)
+    }
+    return acc
+  }, [])
+}
+
 module.exports = {
   any: any,
   applyWhen: applyWhen,
   contains: contains,
   clone: clone,
+  each: each,
   find: find,
   filter: filter,
   flatten: flatten,
   getArguments: getArguments,
   getObjectTag: getObjectTag,
+  intersection: intersection,
   isDate: isDate,
+  isEqual: isEqual,
   isFunction: isFunction,
   isNumber: isNumber,
   isObject: isObject,
@@ -197,9 +271,17 @@ module.exports = {
   isPromisey: isPromisey,
   isStub: isStub,
   isString: isString,
+  last: last,
   lift: lift,
+  map: map,
+  matches: matches,
+  noop: noop,
   parseFunction: parseFunction,
+  reduce: reduce,
   trim: trim,
   trimString: trimString,
-  type: type
+  type: type,
+  uniq: uniq,
+  values: values,
+  without: without
 }
