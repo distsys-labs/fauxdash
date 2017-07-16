@@ -125,20 +125,39 @@ describe('fauxdash', function () {
       _.getArguments(function (a, b, c) {}).should.eql(['a', 'b', 'c'])
       _.getArguments((a, b, c, d) => {}).should.eql(['a', 'b', 'c', 'd'])
       _.getArguments(a => {}).should.eql(['a'])
+      _.getArguments(function(a = 1) {}).should.eql(['a'])
+      _.getArguments((a = 1) => {}).should.eql(['a'])
+      _.getArguments((a = 1, b = true) => {}).should.eql(['a', 'b'])
+      _.getArguments((a = 'hello', b = 2) => {}).should.eql(['a', 'b'])
     })
 
     it('should parse function correctly', function () {
-      _.parseFunction(function one (a, b, c) {})
+      return _.parseFunction(function one (a, b, c) {})
         .should.partiallyEql({ name: 'one', arguments: ['a', 'b', 'c'] })
     })
 
     it('should parse function correctly', function () {
-      _.parseFunction((a, b) => {})
+      return _.parseFunction((a, b) => {})
         .should.partiallyEql({ name: undefined, arguments: ['a', 'b'] })
     })
 
     it('should parse function correctly', function () {
-      _.parseFunction(a => {})
+      return _.parseFunction(a => {})
+        .should.partiallyEql({ name: undefined, arguments: ['a'] })
+    })
+
+    it('should parse function correctly', function () {
+      return _.parseFunction(function one (a = 1, b = true, c = 'hi') {})
+        .should.partiallyEql({ name: 'one', arguments: ['a', 'b', 'c'] })
+    })
+
+    it('should parse function correctly', function () {
+      return _.parseFunction((a, b={ c: 1 }) => {})
+        .should.partiallyEql({ name: undefined, arguments: ['a', 'b'] })
+    })
+
+    it('should parse function correctly', function () {
+      return _.parseFunction((a = 1) => {})
         .should.partiallyEql({ name: undefined, arguments: ['a'] })
     })
   })

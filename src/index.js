@@ -1,5 +1,5 @@
-const FUNCTION_REGEX = /(function)?(\s[a-zA-Z0-9_]*)?[(]?([^=>)]*)[)]?\W*[{=>]*\W*([\s\S]+)?[};]{0,}/m
-const ARGUMENT_REGEX = /^(function\s*\w*\s*)?[(]?([^)=]*)[)]?\s*(=>)?\s*[{]/
+const FUNCTION_REGEX = /(function)?(\s[a-zA-Z0-9_]*)?[(]?([^>)]*)[)]?\W*[{=>]*\W*([\s\S]+)?[};]{0,}/m
+const ARGUMENT_REGEX = /^(function\s*\w*\s*)?[(]?([^)>]*)[)]?\s*(=>)?\s*[{]/
 /**
  * Object Comparison Approach Copied & Adapted from Lodash
  * Lodash <https://lodash.com/>
@@ -95,9 +95,8 @@ function flatten (list) {
 
 function getArguments (fn) {
   const match = ARGUMENT_REGEX.exec(fn.toString())
-  return filter(match[ 2 ]
-    .replace(/\s/g, '')
-    .split(','))
+  return filter(match[ 2 ].replace(/\s/g, '').split(','))
+    .map(x => x.split('=')[0])
 }
 
 function getObjectTag (value) {
@@ -202,7 +201,8 @@ function parseFunction (fn) {
     name: parts[ 2 ] ? parts[ 2 ].trim() : undefined,
     arguments: filter(parts[ 3 ]
       .replace(/\s/g, '')
-      .split(',')),
+      .split(','))
+      .map(x => x.split('=')[0]),
     body: parts[ 4 ]
   }
 }
