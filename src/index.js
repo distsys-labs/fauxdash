@@ -1,5 +1,6 @@
 const FUNCTION_REGEX = /(function)?(\s[a-zA-Z0-9_]*)?[(]?([^>)]*)[)]?\W*[{=>]*\W*([\s\S]+)?[};]{0,}/m
-const ARGUMENT_REGEX = /^(function\s*\w*\s*)?[(]?([^)>]*)[)]?\s*(=>)?\s*[{]/
+const ARGUMENT_REGEX = /^(function\s*\w*\s*)?[(]?([^{>]*)[)]?\s*(=>)?\s*[{]?/
+const NYC_DEFAULT_REGEX = /[=]\s*[(][^)]+[)]/g
 /**
  * Object Comparison Approach Copied & Adapted from Lodash
  * Lodash <https://lodash.com/>
@@ -9,17 +10,41 @@ const ARGUMENT_REGEX = /^(function\s*\w*\s*)?[(]?([^)>]*)[)]?\s*(=>)?\s*[{]/
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  */
 /** `Object#toString` result references. */
+/* eslint-disable */
+const ARGUMENTS_TAG = '[object Arguments]'
+const ARRAY_TAG = '[object Array]'
 const ASYNC_TAG = '[object AsyncFunction]'
 const BOOL_TAG = '[object Boolean]'
 const DATE_TAG = '[object Date]'
+const ERROR_TAG = '[object Error]'
 const FUNC_TAG = '[object Function]'
 const GEN_TAG = '[object GeneratorFunction]'
+const MAP_TAG = '[object Map]'
 const NUMBER_TAG = '[object Number]'
+const NULL_TAG = '[object Null]'
+const OBJECT_TAG = '[object Object]'
 const PROMISE_TAG = '[object Promise]'
 const PROXY_TAG = '[object Proxy]'
 const REGEX_TAG = '[object RegExp]'
+const SET_TAG = '[object Set]'
 const STRING_TAG = '[object String]'
+const SYMBOL_TAG = '[object Symbol]'
+const UNDEFINED_TAG = '[object Undefined]'
+const WEAKMAP_TAG = '[object WeakMap]'
+const WEAKSET_TAG = '[object WeakSet]'
+const ARRAYBUFFER_TAG = '[object ArrayBuffer]'
+const DATAVIEW_TAG = '[object DataView]'
+const FLOAT32_TAG = '[object Float32Array]'
+const FLOAT64_TAG = '[object Float64Array]'
+const INT8_TAG = '[object Int8Array]'
+const INT16_TAG = '[object Int16Array]'
+const INT32_TAG = '[object Int32Array]'
+const UINT8_TAG = '[object Uint8Array]'
+const UINT8CLAMP_TAG = '[object Uint8ClampedArray]'
+const UINT16_TAG = '[object Uint16Array]'
+const UINT32_TAG = '[object Uint32Array]'
 const NOT_AN_OBJECT = ''
+/* eslint-enable */
 
 function any (list, predicate = y => y) {
   let met = false
@@ -36,7 +61,7 @@ function applyWhen (fn, args) {
   if (!args || args.length === 0) {
     return fn()
   } else {
-    return Promise.all(args.map(arg => isPromisey(arg) ? arg : arg))
+    return Promise.all(args.map(arg => isPromisey(arg) ? arg : Promise.resolve(arg)))
       .then(values => fn.apply(null, values))
   }
 }
@@ -62,11 +87,27 @@ function clone (source, target) {
 }
 
 function contains (list, value) {
-  return list.indexOf(value) >= 0
+  return list && list.indexOf(value) >= 0
 }
 
-function each (obj, fn) {
-  return Object.keys(obj).forEach(k => fn(obj[k], k))
+function defaults (target, ...sources) {
+  sources.forEach((source) => {
+    for (let key in source) {
+      if (!target[ key ]) {
+        target[ key ] = source[ key ]
+      }
+    }
+  })
+  return target
+}
+
+function each (obj, iterator) {
+  return Object.keys(obj)
+    .forEach(key => iterator(obj[key], key))
+}
+
+function exists (x) {
+  return x !== undefined && x !== null
 }
 
 function filter (list, predicate = y => y) {
@@ -88,14 +129,15 @@ function find (list, predicate = y => y) {
 }
 
 function flatten (list) {
-  return list.reduce((a, b) =>
-    a.concat(Array.isArray(b) ? flatten(b) : b)
+  return list.reduce((acc, b) =>
+    acc.concat(Array.isArray(b) ? flatten(b) : b)
   , [])
 }
 
 function getArguments (fn) {
-  const match = ARGUMENT_REGEX.exec(fn.toString())
-  return filter(match[ 2 ].replace(/\s/g, '').split(','))
+  const source = fn.toString().replace(NYC_DEFAULT_REGEX, '')
+  const match = ARGUMENT_REGEX.exec(source)
+  return filter(match[ 2 ].replace(/[) ]/g, '').split(','))
     .map(x => x.split('=')[0])
 }
 
@@ -104,6 +146,10 @@ function getObjectTag (value) {
     return NOT_AN_OBJECT
   }
   return Object.prototype.toString.call(value)
+}
+
+function has (object, key) {
+  return object && exists(object[ key ])
 }
 
 function intersection (a, b) {
@@ -189,14 +235,49 @@ function map (obj, fn) {
   return Object.keys(obj).map(k => fn(obj[k], k))
 }
 
+function mapCall (method, map) {
+  let argumentList = getArguments(method).slice(1)
+  if (map === false || map === undefined) {
+    return method
+  } else if (map) {
+    return function (actor, message) {
+      let appliedArgs = [ actor ]
+      argumentList.forEach((arg) => {
+        let prop = map[ arg ] ? map[ arg ] : arg
+        appliedArgs.push(message[ prop ])
+      })
+      return method.apply(undefined, appliedArgs)
+    }
+  } else {
+    return function (actor, message) {
+      let appliedArgs = [ actor ]
+      argumentList.each((arg) => {
+        appliedArgs.push(message[ arg ])
+      })
+      return method.apply(undefined, appliedArgs)
+    }
+  }
+}
+
 function matches (filter) {
   return isEqual.bind(null, filter)
+}
+
+function omit (obj, ...keys) {
+  const list = flatten(keys)
+  return reduce(obj, (o, v, k) => {
+    if (!contains(list, k)) {
+      o[k] = v
+    }
+    return o
+  }, {})
 }
 
 function noop () {}
 
 function parseFunction (fn) {
-  const parts = FUNCTION_REGEX.exec(fn.toString())
+  const source = fn.toString().replace(NYC_DEFAULT_REGEX, '')
+  const parts = FUNCTION_REGEX.exec(source)
   return {
     name: parts[ 2 ] ? parts[ 2 ].trim() : undefined,
     arguments: filter(parts[ 3 ]
@@ -212,6 +293,55 @@ function reduce (obj, fn, acc) {
     acc = fn(acc, obj[k], k)
   })
   return acc
+}
+
+function sequence (...args) {
+  const calls = flatten(args)
+  if (!calls || calls.length === 0) {
+    return Promise.resolve([])
+  }
+  let list = new Array(calls.length)
+  let index = -1
+  function invoke () {
+    const value = calls[ ++index ]()
+    if (isPromisey(value)) {
+      return value.then(next, next)
+    } else {
+      return next(value)
+    }
+  }
+  function next (result) {
+    list[ index ] = result
+    if (index < list.length - 1) {
+      return invoke()
+    } else {
+      return list
+    }
+  }
+  return invoke()
+}
+
+function sortBy (list, prop) {
+  list.sort((a, b) => {
+    if (a[ prop ] < b[ prop ]) {
+      return -1
+    } else if (a[ prop ] > b[ prop ]) {
+      return 1
+    } else {
+      return 0
+    }
+  })
+  return list
+}
+
+function transform (obj, aliases, ...omit) {
+  const list = flatten(omit)
+  return reduce(obj, (o, v, k) => {
+    if (!contains(list, k)) {
+      o[ aliases[k] || k ] = v
+    }
+    return o
+  }, {})
 }
 
 function trimString (str) {
@@ -230,6 +360,18 @@ function uniq (original) {
   return original.reduce((acc, x) => {
     if (!contains(acc, x)) {
       acc.push(x)
+    }
+    return acc
+  }, [])
+}
+
+function unique (list, identity = x => x) {
+  let ids = []
+  return list.reduce((acc, item) => {
+    let id = identity(item)
+    if (ids.indexOf(id) < 0) {
+      ids.push(id)
+      acc.push(item)
     }
     return acc
   }, [])
@@ -255,12 +397,15 @@ module.exports = {
   applyWhen: applyWhen,
   contains: contains,
   clone: clone,
+  defaults: defaults,
   each: each,
+  exists: exists,
   find: find,
   filter: filter,
   flatten: flatten,
   getArguments: getArguments,
   getObjectTag: getObjectTag,
+  has: has,
   intersection: intersection,
   isDate: isDate,
   isEqual: isEqual,
@@ -274,14 +419,20 @@ module.exports = {
   last: last,
   lift: lift,
   map: map,
+  mapCall: mapCall,
   matches: matches,
+  omit: omit,
   noop: noop,
   parseFunction: parseFunction,
   reduce: reduce,
+  sequence: sequence,
+  sortBy: sortBy,
+  transform: transform,
   trim: trim,
   trimString: trimString,
   type: type,
   uniq: uniq,
+  unique: unique,
   values: values,
   without: without
 }

@@ -5,7 +5,7 @@ require('./setup')
 const _ = require('../src/index')
 
 describe('fauxdash', function () {
-  describe('Array Functions', function () {
+  describe('Array functions', function () {
     it('should correctly evaluate any', function () {
       _.any([,,, 5]).should.equal(true)
       _.any([,,,, ]).should.equal(false)
@@ -60,6 +60,31 @@ describe('fauxdash', function () {
         .should.eql([1,2,3,4,5,6,7,8,9])
       _.uniq(['alice','bob','clarice','dan','erica','frank','alice','erica','dan','felicia','dan','frank'])
         .should.eql(['alice','bob','clarice','dan','erica','frank','felicia'])
+
+      _.unique([
+          { name: 'elizabeth' },
+          { name: 'alice' },
+          { name: 'francesca' },
+          { name: 'barbara' },
+          { name: 'clarice' },
+          { name: 'francesca' },
+          { name: 'clarice' },
+          { name: 'daria' },
+          { name: 'barbara' },
+          { name: 'elizabeth' },
+          { name: 'francesca' },
+          { name: 'gloria' },
+          { name: 'gloria' }
+        ], x => x.name)
+      .should.eql([
+        { name: 'elizabeth' },
+        { name: 'alice' },
+        { name: 'francesca' },
+        { name: 'barbara' },
+        { name: 'clarice' },
+        { name: 'daria' },
+        { name: 'gloria' }
+      ])
     })
 
     it('should apply without correctly', function () {
@@ -229,6 +254,219 @@ describe('fauxdash', function () {
 
       m2({a: true, b: 'string', c: { d: 1 }}).should.equal(true)
       m2({a: true, b: 'string', c: { d: 2 }}).should.equal(false)
+    })
+  })
+
+  describe('Sorting by property', () => {
+    it('should sort numeric properties correctly', () => {
+      _.sortBy([ { age: 30 }, { age: 10 }, { age: 40 }, { age: 19 }, { age: 2 } ], 'age')
+        .should.eql([ { age: 2 }, { age: 10 }, { age: 19 }, { age: 30 }, { age: 40 } ])
+    })
+
+    it('should sort alphabetic properties correctly', () => {
+      _.sortBy([ { name: 'zak' }, { name: 'ed' }, { name: 'amy' }, { name: 'jim' }, { name: 'pam' } ], 'name')
+        .should.eql([ { name: 'amy' }, { name: 'ed' }, { name: 'jim' }, { name: 'pam' }, { name: 'zak' } ])
+    })
+  })
+
+  describe('MapCall: Spreading hash properties over function parameters', () => {
+    function testCall (actor, argOne, argTwo, argThree) {
+      return [ actor, argOne, argTwo, argThree ]
+    }
+
+    var model = {
+      test: testCall
+    }
+    var actor = { id: 'testing' }
+
+    describe('with exact matches', () => {
+      var message = { argOne: 1, argTwo: 'two', argThree: true }
+      var result
+
+      before(() => {
+        var fn = _.mapCall(model.test, true)
+        result = fn(actor, message)
+      })
+
+      it('should call the function with correct arguments', () => {
+        result.should.eql([ actor, 1, 'two', true ])
+      })
+    })
+
+    describe('with partial matches and a map', () => {
+      describe('and a map', () => {
+        var message = { argOne: 1, arg2: 'two', argThree: true }
+        var result
+
+        before(() => {
+          var fn = _.mapCall(model.test, {
+            argTwo: 'arg2'
+          })
+
+          result = fn(actor, message)
+        })
+
+        it('should call the function with correct arguments', () => {
+          result.should.eql([ actor, 1, 'two', true ])
+        })
+      })
+
+      describe('and no map', () => {
+        var message = { argOne: 1, arg2: 'two', argThree: true }
+        var result
+
+        before(() => {
+          var fn = _.mapCall(model.test, true)
+          result = fn(actor, message)
+        })
+
+        it('should call the function with correct arguments', () => {
+          result.should.eql([ actor, 1, undefined, true ])
+        })
+      })
+    })
+
+    describe('with no matches', () => {
+      describe('and a map', () => {
+        var message = { arg1: 1, arg2: 'two', arg3: true }
+        var result
+
+        before(() => {
+          var fn = _.mapCall(model.test, {
+            argOne: 'arg1',
+            argTwo: 'arg2',
+            argThree: 'arg3'
+          })
+
+          result = fn(actor, message)
+        })
+
+        it('should call the function with correct arguments', () => {
+          result.should.eql([ actor, 1, 'two', true ])
+        })
+      })
+
+      describe('and no valid map', () => {
+        var message = { arg1: 1, arg2: 'two', arg3: true }
+        var result
+
+        before(() => {
+          var fn = _.mapCall(model.test, true)
+          result = fn(actor, message)
+        })
+
+        it('should call the function with undefined arguments', () => {
+          result.should.eql([ actor, undefined, undefined, undefined ])
+        })
+      })
+    })
+  })
+
+  describe('Object manipulation', function () {
+    it('should omit keys', function () {
+      _.omit({a: 1, b: 2, c: 3, d: 4, e: 5, f: 6}, 'c', 'f', 'i')
+        .should.eql({a: 1, b: 2, d: 4, e: 5})
+
+      _.omit({a: 1, b: 2, c: 3, d: 4, e: 5, f: 6}, ['a', 'd', 'g'])
+        .should.eql({b: 2, c: 3, e: 5, f: 6})
+    })
+
+    it('should transform object', function () {
+      _.transform({a: 1, b: 2, c: 3, d: 4}, {b: 'beta', c: 'gamma'})
+        .should.eql({a: 1, beta: 2, gamma: 3, d: 4})
+
+      _.transform({a: 1, b: 2, c: 3, d: 4}, {b: 'beta', c: 'gamma', d: 'delta', e: 'echo'}, 'a', 'd')
+        .should.eql({beta: 2, gamma: 3})
+    })
+
+    it('should populate missing keys from defaults', function () {
+      const default1 = { b: 2, c: 4, d: 4 }
+      const default2 = { a: 1, b: 1 }
+      const settings = { c: 3 }
+      const result = _.defaults(settings, default1, default2)
+      result.should.eql({ a: 1, b: 2, c: 3, d: 4 })
+    })
+
+    it('should create a valid deep clone', function () {
+      class Item {
+        constructor (a, b, c) {
+          this.a = a
+          this.b = b
+          this.c = c
+        }
+      }
+      const source = {
+        a: 1,
+        b: 'two',
+        c: true,
+        d: [1, 'two', true],
+        e: {
+          a: 2, 
+          b: [ 'three', 'four', [5, 6, 7] ]
+        },
+        f: [
+          { a: 'one', b: 'two' },
+          { a: 'one', b: 'two', c: [ 1, 2, 3, Date.now() ] },
+          { a: 'one', b: 'two' },
+          { items: [
+            new Item(1, 2, 3),
+            new Item('4', 'five', {six: 6}),
+            new Item(true, Date.now(), 9),
+          ]}
+        ]
+      }
+      const copy = _.clone(source)
+      copy.should.eql(source)
+      copy.f[3].items[1].c.six = 7
+      copy.should.not.eql(source)
+    })
+  })
+
+  describe('Promise helpers', function () {
+    describe('when applying promises to a function call', function () {
+      it('should resolve arguments first', function () {
+        return _.applyWhen((a, b, c, d) => {
+          return (a + b + c) / d
+        }, [
+          1,
+          Promise.resolve(2),
+          Promise.resolve(3),
+          2
+        ]).should.eventually.equal(3)
+      })
+
+      it('should reject on failed argument', function () {
+        return _.applyWhen((a, b, c, d) => {
+          return (a + b + c) / d
+        }, [
+          1,
+          Promise.reject(new Error('no')),
+          Promise.resolve(3),
+          2
+        ]).should.be.rejectedWith('no')
+      })
+    })
+
+    describe('when calling promise functions in a sequence', function () {
+      describe('calling functions from an array', function () {
+        it('should resolve to an ordered array', function () {
+          return _.sequence([
+            () => Promise.resolve(1),
+            () => 2,
+            () => Promise.resolve(3)
+          ]).should.eventually.eql([1,2,3])
+        })
+      })
+
+      describe('calling function arguments', function () {
+        it('should resolve to an ordered array', function () {
+          return _.sequence(
+            () => Promise.resolve(1),
+            () => 2,
+            () => Promise.resolve(3)
+          ).should.eventually.eql([1,2,3])
+        })
+      })
     })
   })
 })
