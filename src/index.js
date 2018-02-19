@@ -66,6 +66,16 @@ function applyWhen (fn, args) {
   }
 }
 
+function bindAll(obj) {
+  const names = Object.getOwnPropertyNames(obj.prototype);
+  names.forEach(name => {
+    const prop = obj.prototype[ name ];
+    if (typeof prop === 'function') {
+      obj[ prop ] = obj.prop.bind( obj );
+    }
+  });
+}
+
 function clone (source, target) {
   const tag = getObjectTag(source)
   if (source == null || typeof source !== 'object') {

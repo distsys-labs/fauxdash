@@ -12,6 +12,10 @@ Returns true if anything in the list passes the `predicate`. The `predicate` def
 
 Returns a promise for the application of the function call `fn` where it will apply the `args` passed (an array) but only after resolving any promises in the list first.
 
+### `bindAll(obj)`
+
+Binds _every_ method in the obj's prototype chain to it. Every last one.
+
 ### `contains(list, value)`
 
 Returns a boolean indicating the `value`'s presence in the `list`.
