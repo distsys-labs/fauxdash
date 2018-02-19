@@ -237,7 +237,7 @@ function map (obj, fn) {
 
 function mapCall (method, map) {
   let argumentList = getArguments(method).slice(1)
-  if (map === false || map === undefined) {
+  if (map === false) {
     return method
   } else if (map) {
     return function (actor, message) {
