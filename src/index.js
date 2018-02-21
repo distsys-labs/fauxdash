@@ -66,14 +66,14 @@ function applyWhen (fn, args) {
   }
 }
 
-function bindAll(obj) {
-  const names = Object.getOwnPropertyNames(obj.prototype);
+function bindAll (obj) {
+  const names = Object.getOwnPropertyNames(obj.prototype)
   names.forEach(name => {
-    const prop = obj.prototype[ name ];
+    const prop = obj.prototype[ name ]
     if (typeof prop === 'function') {
-      obj[ prop ] = obj.prop.bind( obj );
+      obj[ prop ] = obj.prop.bind(obj)
     }
-  });
+  })
 }
 
 function clone (source, target) {
@@ -261,7 +261,7 @@ function mapCall (method, map) {
   } else {
     return function (actor, message) {
       let appliedArgs = [ actor ]
-      argumentList.each((arg) => {
+      argumentList.forEach((arg) => {
         appliedArgs.push(message[ arg ])
       })
       return method.apply(undefined, appliedArgs)
@@ -405,6 +405,7 @@ function without (a, b) {
 module.exports = {
   any: any,
   applyWhen: applyWhen,
+  bindAll: bindAll,
   contains: contains,
   clone: clone,
   defaults: defaults,
