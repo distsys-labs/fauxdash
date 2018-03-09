@@ -217,9 +217,9 @@ describe('fauxdash', function () {
     it('should iterate on object key/values', function() {
       const keys = []
       const values = []
-      _.each({a: 1, b: 2, c: 3}, (v, k) => {
+      _.each({a: 1, b: 1, c: 1}, (v, k, i) => {
         keys.push(k)
-        values.push(v)
+        values.push(v + i)
       })
       keys.should.eql(['a','b','c'])
       values.should.eql([1,2,3])
@@ -228,6 +228,9 @@ describe('fauxdash', function () {
     it('should map on object key/values', function() {
       _.map({a: 1, b: 2, c: 3}, (v, k) => `${k}:${v}`)
         .should.eql(['a:1','b:2','c:3'])
+
+      _.map({a: 1, b: 1, c: 1}, (v, k, i) => `${k}:${v+i}`)
+        .should.eql(['a:1','b:2','c:3'])      
     })
 
     it('should reduce on object key/values', function() {
@@ -235,6 +238,9 @@ describe('fauxdash', function () {
         .should.equal(6)
       _.reduce({a: 1, b: 2, c: 3}, (acc, v, k) =>
         acc += `${k}=>${v}`
+      , '').should.equal('a=>1b=>2c=>3')
+      _.reduce({a: 1, b: 1, c: 1}, (acc, v, k, i) =>
+        acc += `${k}=>${v+i}`
       , '').should.equal('a=>1b=>2c=>3')
     })
 

@@ -113,7 +113,7 @@ function defaults (target, ...sources) {
 
 function each (obj, iterator) {
   return Object.keys(obj)
-    .forEach(key => iterator(obj[key], key))
+    .forEach((key, i) => iterator(obj[key], key, i))
 }
 
 function exists (x) {
@@ -242,7 +242,7 @@ function lift (asyncFn) {
 }
 
 function map (obj, fn) {
-  return Object.keys(obj).map(k => fn(obj[k], k))
+  return Object.keys(obj).map((k, i) => fn(obj[k], k, i))
 }
 
 function mapCall (method, map) {
@@ -299,8 +299,8 @@ function parseFunction (fn) {
 }
 
 function reduce (obj, fn, acc) {
-  Object.keys(obj).forEach(k => {
-    acc = fn(acc, obj[k], k)
+  Object.keys(obj).forEach((k, i) => {
+    acc = fn(acc, obj[k], k, i)
   })
   return acc
 }
