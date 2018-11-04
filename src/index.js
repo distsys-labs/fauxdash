@@ -1,4 +1,4 @@
-const FUNCTION_REGEX = /(function)?(\s[a-zA-Z0-9_]*)?[(]?([^>)]*)[)]?\W*[{=>]*\W*([\s\S]+)?[};]{0,}/m
+const FUNCTION_REGEX = /(function)?(\s[a-zA-Z0-9_]*\s*)?[(]?([^>)]*)[)]?\W*[{=>]*\W*([\s\S]+)?[};]{0,}/m
 const ARGUMENT_REGEX = /^(function\s*\w*\s*)?[(]?([^{>]*)[)]?\s*(=>)?\s*[{]?/
 const NYC_DEFAULT_REGEX = /[=]\s*[(][^)]+[)]/g
 /**
@@ -273,6 +273,40 @@ function matches (filter) {
   return isEqual.bind(null, filter)
 }
 
+function merge (...objects) {
+  let copy = {}
+  let head
+  while (objects.length > 0) {
+    head = objects.shift()
+    copy = mergeTwo(head, copy)
+  }
+  return copy
+}
+
+function mergeTwo (source, target) {
+  const tag = getObjectTag(source)
+  if (source == null || typeof source !== 'object') {
+    return source
+  } else if (!isObject(source) && !Array.isArray(source)) {
+    return target
+  } else if (Array.isArray(source) && target) {
+    return source.concat(target)
+  } else if (tag === BOOL_TAG || tag === STRING_TAG || tag === NUMBER_TAG ||
+            tag === FUNC_TAG || tag === DATE_TAG || tag === REGEX_TAG ||
+            tag === GEN_TAG || tag === ASYNC_TAG || tag === PROXY_TAG ||
+            tag === PROMISE_TAG) {
+    return new source.constructor(source)
+  }
+
+  target = target || new source.constructor()
+  for (var key in source) {
+    target[ key ] = typeof target[ key ] === 'undefined'
+      ? mergeTwo(source[ key ], null)
+      : mergeTwo(source[ key ], target[ key ])
+  }
+  return target
+}
+
 function omit (obj, ...keys) {
   const list = flatten(keys)
   return reduce(obj, (o, v, k) => {
@@ -288,6 +322,7 @@ function noop () {}
 function parseFunction (fn) {
   const source = fn.toString().replace(NYC_DEFAULT_REGEX, '')
   const parts = FUNCTION_REGEX.exec(source)
+  console.log(source)
   return {
     name: parts[ 2 ] ? parts[ 2 ].trim() : undefined,
     arguments: filter(parts[ 3 ]
@@ -432,6 +467,7 @@ module.exports = {
   map: map,
   mapCall: mapCall,
   matches: matches,
+  merge: merge,
   omit: omit,
   noop: noop,
   parseFunction: parseFunction,

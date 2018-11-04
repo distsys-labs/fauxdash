@@ -82,6 +82,10 @@ Returns a new function that takes a context argument and an object to be mapped 
 
 Creates a new function that compares a value for deep equality to make comparisons simpler and repeatable.
 
+### `merge(...objects)`
+
+Deep merges objects provided with the latter overriding the former.
+
 ### `omit(obj, ...keys)`
 
 Returns a new version of `obj` without the `keys`.
