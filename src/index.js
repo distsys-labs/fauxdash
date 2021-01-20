@@ -67,11 +67,12 @@ function applyWhen (fn, args) {
 }
 
 function bindAll (obj) {
-  const names = Object.getOwnPropertyNames(obj.prototype)
+  const target = obj.prototype !== undefined ? obj : obj.prototype
+  const names = Object.getOwnPropertyNames(target)
   names.forEach(name => {
-    const prop = obj.prototype[ name ]
+    const prop = target[name]
     if (typeof prop === 'function') {
-      obj[ prop ] = obj.prop.bind(obj)
+      obj[prop] = obj.prop.bind(obj)
     }
   })
 }
@@ -90,8 +91,8 @@ function clone (source, target) {
   }
 
   target = target || new source.constructor()
-  for (var key in source) {
-    target[ key ] = typeof target[ key ] === 'undefined' ? clone(source[ key ], null) : target[ key ]
+  for (const key in source) {
+    target[key] = typeof target[key] === 'undefined' ? clone(source[key], null) : target[key]
   }
   return target
 }
@@ -102,9 +103,9 @@ function contains (list, value) {
 
 function defaults (target, ...sources) {
   sources.forEach((source) => {
-    for (let key in source) {
-      if (!target[ key ]) {
-        target[ key ] = source[ key ]
+    for (const key in source) {
+      if (!target[key]) {
+        target[key] = source[key]
       }
     }
   })
@@ -130,9 +131,9 @@ function find (list, predicate = y => y) {
   }
   let found = false
   let index = -1
-  var item
+  let item
   do {
-    item = list[ ++index ]
+    item = list[++index]
     found = predicate(item)
   } while (!found && index < list.length - 1)
   return found ? item : undefined
@@ -147,7 +148,7 @@ function flatten (list) {
 function getArguments (fn) {
   const source = fn.toString().replace(NYC_DEFAULT_REGEX, '')
   const match = ARGUMENT_REGEX.exec(source)
-  return filter(match[ 2 ].replace(/[) ]/g, '').split(','))
+  return filter(match[2].replace(/[) ]/g, '').split(','))
     .map(x => x.split('=')[0])
 }
 
@@ -159,7 +160,7 @@ function getObjectTag (value) {
 }
 
 function has (object, key) {
-  return object && exists(object[ key ])
+  return object && exists(object[key])
 }
 
 function intersection (a, b) {
@@ -246,23 +247,23 @@ function map (obj, fn) {
 }
 
 function mapCall (method, map) {
-  let argumentList = getArguments(method).slice(1)
+  const argumentList = getArguments(method).slice(1)
   if (map === false) {
     return method
   } else if (map) {
     return function (actor, message) {
-      let appliedArgs = [ actor ]
+      const appliedArgs = [actor]
       argumentList.forEach((arg) => {
-        let prop = map[ arg ] ? map[ arg ] : arg
-        appliedArgs.push(message[ prop ])
+        const prop = map[arg] ? map[arg] : arg
+        appliedArgs.push(message[prop])
       })
       return method.apply(undefined, appliedArgs)
     }
   } else {
     return function (actor, message) {
-      let appliedArgs = [ actor ]
+      const appliedArgs = [actor]
       argumentList.forEach((arg) => {
-        appliedArgs.push(message[ arg ])
+        appliedArgs.push(message[arg])
       })
       return method.apply(undefined, appliedArgs)
     }
@@ -289,12 +290,12 @@ function parseFunction (fn) {
   const source = fn.toString().replace(NYC_DEFAULT_REGEX, '')
   const parts = FUNCTION_REGEX.exec(source)
   return {
-    name: parts[ 2 ] ? parts[ 2 ].trim() : undefined,
-    arguments: filter(parts[ 3 ]
-      .replace(/\s/g, '')
+    name: parts[2] ? parts[2].trim() : undefined,
+    arguments: filter(parts[3]
+      .replace(/(\s|[\(])/g, '')
       .split(','))
       .map(x => x.split('=')[0]),
-    body: parts[ 4 ]
+    body: parts[4]
   }
 }
 
@@ -310,10 +311,10 @@ function sequence (...args) {
   if (!calls || calls.length === 0) {
     return Promise.resolve([])
   }
-  let list = new Array(calls.length)
+  const list = new Array(calls.length)
   let index = -1
   function invoke () {
-    const value = calls[ ++index ]()
+    const value = calls[++index]()
     if (isPromisey(value)) {
       return value.then(next, next)
     } else {
@@ -321,7 +322,7 @@ function sequence (...args) {
     }
   }
   function next (result) {
-    list[ index ] = result
+    list[index] = result
     if (index < list.length - 1) {
       return invoke()
     } else {
@@ -333,9 +334,9 @@ function sequence (...args) {
 
 function sortBy (list, prop) {
   list.sort((a, b) => {
-    if (a[ prop ] < b[ prop ]) {
+    if (a[prop] < b[prop]) {
       return -1
-    } else if (a[ prop ] > b[ prop ]) {
+    } else if (a[prop] > b[prop]) {
       return 1
     } else {
       return 0
@@ -348,7 +349,7 @@ function transform (obj, aliases, ...omit) {
   const list = flatten(omit)
   return reduce(obj, (o, v, k) => {
     if (!contains(list, k)) {
-      o[ aliases[k] || k ] = v
+      o[aliases[k] || k] = v
     }
     return o
   }, {})
@@ -376,9 +377,9 @@ function uniq (original) {
 }
 
 function unique (list, identity = x => x) {
-  let ids = []
+  const ids = []
   return list.reduce((acc, item) => {
-    let id = identity(item)
+    const id = identity(item)
     if (ids.indexOf(id) < 0) {
       ids.push(id)
       acc.push(item)

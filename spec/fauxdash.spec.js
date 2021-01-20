@@ -157,8 +157,9 @@ describe('fauxdash', function () {
     })
 
     it('should parse function correctly', function () {
-      return _.parseFunction(function one (a, b, c) {})
-        .should.partiallyEql({ name: 'one', arguments: ['a', 'b', 'c'] })
+      var results = _.parseFunction(function one (a, b, c) {})
+      console.log(results)
+      return results.should.partiallyEql({ name: 'one', arguments: ['a', 'b', 'c'] })
     })
 
     it('should parse function correctly', function () {
