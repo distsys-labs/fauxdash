@@ -427,6 +427,75 @@ describe('fauxdash', function () {
       copy.f[3].items[1].c.six = 7
       copy.should.not.eql(source)
     })
+
+    it('should merge objects', function () {
+      const one = {
+        a: {
+          c: 1,
+          e: {
+            f: [
+              { g: { a: 1 } }
+            ]
+          }
+        },
+        b: {
+          i: [
+            { j: 'one' }
+          ]
+        }
+      }
+      const two = {
+        a: {
+          d: 2,
+          e: {
+            f: [
+              { c: 3 }
+            ]
+          }
+        },
+        b: {
+          i: [
+            { k: 'two' }
+          ]
+        }
+      }
+      const three = {
+        a: {
+          d: 2,
+          e: {
+            f: [
+              { h: { b: 2 } }
+            ]
+          }
+        },
+        b: {
+          i: [
+            { l: 'three' }
+          ]
+        }
+      }
+      const merge = _.merge(one, two, three)
+      merge.should.eql({
+        a: {
+          c: 1,
+          d: 2,
+          e: {
+            f: [
+              { h: { b: 2 } },
+              { c: 3 },
+              { g: { a: 1 } }              
+            ]
+          }
+        },
+        b: {
+          i: [ 
+            { l: 'three' },
+            { k: 'two' },
+            { j: 'one' }
+          ]
+        }
+      })
+    })
   })
 
   describe('Promise helpers', function () {

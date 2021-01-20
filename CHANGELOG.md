@@ -2,15 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-<a name="1.3.3"></a>
+<a name="1.4.1"></a>
 ## [1.3.3](https://github.com/deftly/fauxdash/compare/v1.3.2...v1.3.3) (2021-01-20)
-
 
 ### Bug Fixes
 
 * improve handling of bindAll to work with objects that have no prototype ([16db7e6](https://github.com/deftly/fauxdash/commit/16db7e6))
+<a name="1.4.0"></a>
+# [1.4.0](https://github.com/deftly/fauxdash/compare/v1.3.2...v1.4.0) (2018-11-04)
 
+### Features
 
+* add deep merge ([d4c7a9f](https://github.com/deftly/fauxdash/commit/d4c7a9f))
 
 <a name="1.3.2"></a>
 ## [1.3.2](https://github.com/deftly/fauxdash/compare/v1.3.1...v1.3.2) (2018-03-09)
