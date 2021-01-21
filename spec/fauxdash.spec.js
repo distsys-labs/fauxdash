@@ -509,6 +509,23 @@ describe('fauxdash', function () {
         }
       })
     })
+
+    it('should melter objects', function () {
+      var a = {
+        one: 1,
+        all: function () {
+          return [this.one, this.two, this.three]
+        }
+      }
+      var b = {
+        two: 2,
+      }
+      var c = {
+        three: 3,
+      }
+      var d = _.melter({}, a, b, c)
+      d.all().should.eql([1, 2, 3])
+    })
   })
 
   describe('Promise helpers', function () {

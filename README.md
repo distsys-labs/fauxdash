@@ -82,6 +82,14 @@ Returns a new function that takes a context argument and an object to be mapped 
 
 Creates a new function that compares a value for deep equality to make comparisons simpler and repeatable.
 
+### `melter(target, ...args)`
+
+Combines objects in the args onto the target and rebinds any `function`s to the new target. Will not work on arrow functions! (their `this` is inherited from lexical scope and cannot be set via `bind`).
+
+### `memoize(function)`
+
+Returns a memoized instance of the function which will memoize results based on a WeakSet of arguments passed.
+
 ### `merge(...objects)`
 
 Deep merges objects provided with the latter overriding the former.

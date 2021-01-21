@@ -278,6 +278,22 @@ function matches (filter) {
   return isEqual.bind(null, filter)
 }
 
+function melter (target, ...args) {
+  if (target === undefined || target === null) {
+    target = {}
+  }
+  args.forEach(o => {
+    each(o, (p, k) => {
+      if (typeof p === 'function') {
+        target[k] = p.bind(target)
+      } else {
+        target[k] = p
+      }
+    })
+  })
+  return target
+}
+
 function memoize (fn) {
   const set = new WeakSet()
   const memod = function (...args) {
@@ -488,6 +504,7 @@ module.exports = {
   map: map,
   mapCall: mapCall,
   matches: matches,
+  melter: melter,
   memoize: memoize,
   merge: merge,
   omit: omit,
