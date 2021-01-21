@@ -67,12 +67,12 @@ function applyWhen (fn, args) {
 }
 
 function bindAll (obj) {
-  const target = obj.prototype !== undefined ? obj : obj.prototype
+  const target = obj.prototype ? obj.prototype : obj
   const names = Object.getOwnPropertyNames(target)
   names.forEach(name => {
     const prop = target[name]
     if (typeof prop === 'function') {
-      obj[prop] = obj.prop.bind(obj)
+      obj[name] = prop.bind(obj)
     }
   })
 }
@@ -178,6 +178,10 @@ function isDate (value) {
   return getObjectTag(value) === DATE_TAG
 }
 
+function isEmpty (value) {
+  return value === null || value === undefined || value === ''
+}
+
 function isEqual (a, b) {
   if (isObject(a) && isObject(b)) {
     return reduce(a, (acc, v, k) => acc && isEqual(v, b[k]), true)
@@ -274,6 +278,21 @@ function matches (filter) {
   return isEqual.bind(null, filter)
 }
 
+function memoize (fn) {
+  const set = new WeakSet()
+  const memod = function (...args) {
+    if (set.has(args)) {
+      return set[args]
+    } else {
+      var result = fn.apply(null, args)
+      set.add(args, result)
+      return result
+    }
+  }
+  memod.name = `memoized#{fn.name}`
+  return memod
+}
+
 function merge (...objects) {
   let copy = {}
   let head
@@ -327,7 +346,7 @@ function parseFunction (fn) {
   return {
     name: parts[2] ? parts[2].trim() : undefined,
     arguments: filter(parts[3]
-      .replace(/(\s|[\(])/g, '')
+      .replace(/(\s|[(])/g, '')
       .split(','))
       .map(x => x.split('=')[0]),
     body: parts[4]
@@ -455,6 +474,7 @@ module.exports = {
   has: has,
   intersection: intersection,
   isDate: isDate,
+  isEmpty: isEmpty,
   isEqual: isEqual,
   isFunction: isFunction,
   isNumber: isNumber,
@@ -468,6 +488,7 @@ module.exports = {
   map: map,
   mapCall: mapCall,
   matches: matches,
+  memoize: memoize,
   merge: merge,
   omit: omit,
   noop: noop,

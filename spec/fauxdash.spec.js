@@ -186,6 +186,19 @@ describe('fauxdash', function () {
       return _.parseFunction((a = 1) => {})
         .should.partiallyEql({ name: undefined, arguments: ['a'] })
     })
+
+    it('should memoize a function correctly', function () {
+      var fn1 = (a, b) => a + b
+      var fn2 = (b, c) => b - c
+
+      var m1 = _.memoize(fn1)
+      var m2 = _.memoize(fn2)
+
+      m1(1, 2).should.equal(3)
+      m2(1, 2).should.equal(-1)
+      m1(4, 3).should.equal(7)
+      m2(4, 3).should.equal(1)
+    })
   })
 
   describe('Utility functions', function () {
