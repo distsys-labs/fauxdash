@@ -145,6 +145,15 @@ function flatten (list) {
   , [])
 }
 
+function future () {
+  let res, rej
+  const promise = new Promise((resolve, reject) => {
+    res = resolve
+    rej = reject
+  })
+  return { promise, resolve: res, reject: rej }
+}
+
 function getArguments (fn) {
   const source = fn.toString().replace(NYC_DEFAULT_REGEX, '')
   const match = ARGUMENT_REGEX.exec(source)
@@ -300,12 +309,12 @@ function memoize (fn) {
     if (set.has(args)) {
       return set[args]
     } else {
-      var result = fn.apply(null, args)
+      const result = fn.apply(null, args)
       set.add(args, result)
       return result
     }
   }
-  memod.name = `memoized#{fn.name}`
+  memod.name = 'memoized#{fn.name}'
   return memod
 }
 
@@ -335,10 +344,10 @@ function mergeTwo (source, target) {
   }
 
   target = target || new source.constructor()
-  for (var key in source) {
-    target[ key ] = typeof target[ key ] === 'undefined'
-      ? mergeTwo(source[ key ], null)
-      : mergeTwo(source[ key ], target[ key ])
+  for (const key in source) {
+    target[key] = typeof target[key] === 'undefined'
+      ? mergeTwo(source[key], null)
+      : mergeTwo(source[key], target[key])
   }
   return target
 }
@@ -485,6 +494,7 @@ module.exports = {
   find: find,
   filter: filter,
   flatten: flatten,
+  future: future,
   getArguments: getArguments,
   getObjectTag: getObjectTag,
   has: has,

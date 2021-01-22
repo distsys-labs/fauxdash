@@ -48,6 +48,10 @@ Returns the first item in the `list` that matches `predicate` where `predicate` 
 
 Returns single dimensional array.
 
+### `future()`
+
+Returns a hash with `promise`, `resolve`, `reject` properties.
+
 ### `getArguments(fn)`
 
 Returns a list of the arguments contained in the function `fn`.

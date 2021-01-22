@@ -574,5 +574,19 @@ describe('fauxdash', function () {
         })
       })
     })
+
+    describe('when creating futures', function () {
+      it('should resolve correctly', function (done) {
+        var { promise, resolve } = _.future()
+        promise.then(() => done())
+        resolve()
+      })
+      
+      it('should reject correctly', function (done) {
+        var { promise, reject } = _.future()
+        promise.then(null, () => done())
+        reject()
+      })
+    })
   })
 })
