@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.7.0"></a>
+# [1.7.0](https://github.com/deftly/fauxdash/compare/v1.6.0...v1.7.0) (2021-01-22)
+
+
+### Features
+
+* add futures ([7a33ea9](https://github.com/deftly/fauxdash/commit/7a33ea9))
+
+
+
 <a name="1.6.0"></a>
 # [1.6.0](https://github.com/deftly/fauxdash/compare/v1.5.0...v1.6.0) (2021-01-21)
 
