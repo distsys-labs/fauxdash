@@ -367,7 +367,6 @@ function noop () {}
 function parseFunction (fn) {
   const source = fn.toString().replace(NYC_DEFAULT_REGEX, '')
   const parts = FUNCTION_REGEX.exec(source)
-  console.log(source)
   return {
     name: parts[2] ? parts[2].trim() : undefined,
     arguments: filter(parts[3]
