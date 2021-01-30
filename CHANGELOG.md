@@ -1,6 +1,13 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [1.7.1](https://github.com/deftly/fauxdash/compare/v1.7.0...v1.7.1) (2021-01-30)
+
+
+### Bug Fixes
+
+* cleanup audit warnings ([e081b2f](https://github.com/deftly/fauxdash/commit/e081b2fe19d27a5ac539e25cdefcbc7df5639ab4))
 
 <a name="1.7.0"></a>
 # [1.7.0](https://github.com/deftly/fauxdash/compare/v1.6.0...v1.7.0) (2021-01-22)
