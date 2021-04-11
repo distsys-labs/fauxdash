@@ -44,6 +44,7 @@ const UINT8CLAMP_TAG = '[object Uint8ClampedArray]'
 const UINT16_TAG = '[object Uint16Array]'
 const UINT32_TAG = '[object Uint32Array]'
 const NOT_AN_OBJECT = ''
+const NULL_PROTOTYPE = Object.getPrototypeOf({})
 /* eslint-enable */
 
 function any (list, predicate = y => y) {
@@ -113,7 +114,7 @@ function defaults (target, ...sources) {
 }
 
 function each (obj, iterator) {
-  return Object.keys(obj)
+  return getKeys(obj)
     .forEach((key, i) => iterator(obj[key], key, i))
 }
 
@@ -161,6 +162,13 @@ function getArguments (fn) {
     .map(x => x.split('=')[0])
 }
 
+function getKeys (obj) {
+  if (obj) {
+    return Object.keys(obj).concat(getPrototypeKeys(obj))
+  }
+  return []
+}
+
 function getObjectTag (value) {
   if (!isObject(value)) {
     return NOT_AN_OBJECT
@@ -168,8 +176,15 @@ function getObjectTag (value) {
   return Object.prototype.toString.call(value)
 }
 
-function has (object, key) {
-  return object && exists(object[key])
+function getPrototypeKeys (obj) {
+  const proto = Object.getPrototypeOf(obj)
+  return proto === NULL_PROTOTYPE
+    ? []
+    : Object.keys(proto)
+}
+
+function has (obj, key) {
+  return obj && exists(obj[key])
 }
 
 function intersection (a, b) {
@@ -218,7 +233,7 @@ function isObject (value) {
 }
 
 function isPlainObject (value) {
-  return (isObject(value) && value.prototype == null)
+  return (isObject(value) && Object.getPrototypeOf(value) === NULL_PROTOTYPE)
 }
 
 function isPromisey (x) {
@@ -256,7 +271,7 @@ function lift (asyncFn) {
 }
 
 function map (obj, fn) {
-  return Object.keys(obj).map((k, i) => fn(obj[k], k, i))
+  return getKeys(obj).map((k, i) => fn(obj[k], k, i))
 }
 
 function mapCall (method, map) {
@@ -378,7 +393,7 @@ function parseFunction (fn) {
 }
 
 function reduce (obj, fn, acc) {
-  Object.keys(obj).forEach((k, i) => {
+  getKeys(obj).forEach((k, i) => {
     acc = fn(acc, obj[k], k, i)
   })
   return acc
