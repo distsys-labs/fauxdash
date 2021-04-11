@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.2](https://github.com/deftly/fauxdash/compare/v1.7.1...v1.7.2) (2021-04-11)
+
+
+### Bug Fixes
+
+* improve calls that iterate instance properties by including first prototype as well ([1f8ca9d](https://github.com/deftly/fauxdash/commit/1f8ca9d8cde22f4f45d31c575a935084acffdd5a))
+
 ### [1.7.1](https://github.com/deftly/fauxdash/compare/v1.7.0...v1.7.1) (2021-01-30)
 
 
