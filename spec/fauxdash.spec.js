@@ -289,12 +289,17 @@ describe('fauxdash', function () {
   })
 
   describe('MapCall: Spreading hash properties over function parameters', () => {
-    function testCall (actor, argOne, argTwo, argThree) {
+    function testCallOne (actor, argOne, argTwo, argThree) {
       return [ actor, argOne, argTwo, argThree ]
     }
 
+    function testCallTwo(actor, data) {
+      return [ actor, data.argOne, data.argTwo, data.argThree ]
+    }
+
     var model = {
-      test: testCall
+      testOne: testCallOne,
+      testTwo: testCallTwo
     }
     var actor = { id: 'testing' }
 
@@ -303,7 +308,7 @@ describe('fauxdash', function () {
       var result
 
       before(() => {
-        var fn = _.mapCall(model.test, true)
+        var fn = _.mapCall(model.testOne, true)
         result = fn(actor, message)
       })
 
@@ -318,7 +323,7 @@ describe('fauxdash', function () {
         var result
 
         before(() => {
-          var fn = _.mapCall(model.test, {
+          var fn = _.mapCall(model.testOne, {
             argTwo: 'arg2'
           })
 
@@ -335,7 +340,7 @@ describe('fauxdash', function () {
         var result
 
         before(() => {
-          var fn = _.mapCall(model.test, true)
+          var fn = _.mapCall(model.testOne, true)
           result = fn(actor, message)
         })
 
@@ -351,7 +356,7 @@ describe('fauxdash', function () {
         var result
 
         before(() => {
-          var fn = _.mapCall(model.test, {
+          var fn = _.mapCall(model.testOne, {
             argOne: 'arg1',
             argTwo: 'arg2',
             argThree: 'arg3'
@@ -370,12 +375,26 @@ describe('fauxdash', function () {
         var result
 
         before(() => {
-          var fn = _.mapCall(model.test, true)
+          var fn = _.mapCall(model.testOne, true)
           result = fn(actor, message)
         })
 
         it('should call the function with undefined arguments', () => {
           result.should.eql([ actor, undefined, undefined, undefined ])
+        })
+      })
+
+      describe('and no valid map but only two arguments', () => {
+        var message = { argOne: 1, argTwo: 'two', argThree: true }
+        var result
+
+        before(() => {
+          var fn = _.mapCall(model.testTwo, true)
+          result = fn(actor, message)
+        })
+
+        it('should call the function with message', () => {
+          result.should.eql([ actor, 1, "two", true ])
         })
       })
     })

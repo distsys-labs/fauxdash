@@ -278,20 +278,21 @@ function mapCall (method, map) {
   const argumentList = getArguments(method).slice(1)
   if (map === false) {
     return method
-  } else if (map) {
-    return function (actor, message) {
-      const appliedArgs = [actor]
-      argumentList.forEach((arg) => {
-        const prop = map[arg] ? map[arg] : arg
-        appliedArgs.push(message[prop])
-      })
-      return method.apply(undefined, appliedArgs)
-    }
   } else {
     return function (actor, message) {
       const appliedArgs = [actor]
+      const messageKeys = getKeys(message)
       argumentList.forEach((arg) => {
-        appliedArgs.push(message[arg])
+        const prop = (map && map[arg]) ? map[arg] : arg
+        if (argumentList.length === 1) {
+          if (contains(messageKeys, prop)) {
+            appliedArgs.push(message[prop])
+          } else {
+            appliedArgs.push(message)
+          }
+        } else {
+          appliedArgs.push(message[prop])
+        }
       })
       return method.apply(undefined, appliedArgs)
     }

@@ -33,6 +33,5 @@
     "nyc": "^15.1.0",
     "standard": "^10.0.3",
     "standard-version": "^9.1.0"
-  },
-  "dependencies": {}
+  }
 }
