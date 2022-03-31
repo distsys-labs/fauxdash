@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.7.3](https://github.com/deftly/fauxdash/compare/v1.7.1...v1.7.3) (2022-03-31)
+
+
+### Bug Fixes
+
+* correct use of mapCall to default to passing an object when no properties were found ([c32bac8](https://github.com/deftly/fauxdash/commit/c32bac81924189cb7a8ef58af34ba0b68ab5fb3c))
+* improve calls that iterate instance properties by including first prototype as well ([1f8ca9d](https://github.com/deftly/fauxdash/commit/1f8ca9d8cde22f4f45d31c575a935084acffdd5a))
+
 ### [1.7.2](https://github.com/deftly/fauxdash/compare/v1.7.1...v1.7.2) (2021-04-11)
 
 
