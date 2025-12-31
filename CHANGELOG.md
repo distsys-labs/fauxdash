@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/deftly/fauxdash/compare/v1.7.3...v1.8.0) (2025-12-31)
+
+
+### Features
+
+* rewrite as TypeScript with vitest for testing ([b1efbe3](https://github.com/deftly/fauxdash/commit/b1efbe3dd8f393de0df50c0a7be2490e2c29d234))
+
 ### [1.7.3](https://github.com/deftly/fauxdash/compare/v1.7.1...v1.7.3) (2022-03-31)
 
 
