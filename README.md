@@ -1,6 +1,6 @@
 # fauxdash
 
-This is because I got tired of writing the same kinds of things over and didn't want the to import 3-5 full dependencies. This is for Node 6 forward only. It should probably never be used outside my own projects.
+This is because I got tired of writing the same kinds of things over and didn't want the to import 3-5 full dependencies. This is for Node 18 forward only. It should probably never be used outside my own projects.
 
 ## API
 
