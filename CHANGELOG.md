@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.2](https://github.com/deftly/fauxdash/compare/v1.8.1...v1.8.2) (2026-01-01)
+
+
+### Bug Fixes
+
+* correct bad export style ([83e48da](https://github.com/deftly/fauxdash/commit/83e48da07b002a73c5a901770783e283450572d7))
+
 ### [1.8.1](https://github.com/deftly/fauxdash/compare/v1.8.0...v1.8.1) (2025-12-31)
 
 ## [1.8.0](https://github.com/deftly/fauxdash/compare/v1.7.3...v1.8.0) (2025-12-31)

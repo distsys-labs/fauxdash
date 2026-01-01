@@ -1,6 +1,6 @@
 {
   "name": "fauxdash",
-  "version": "1.8.1",
+  "version": "1.8.2",
   "description": "I don't know it's not lodash",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
