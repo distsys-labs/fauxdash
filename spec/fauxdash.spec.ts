@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import * as _ from '../src/index';
+import _ from '../src/index';
 
 describe('fauxdash', () => {
   describe('Array functions', () => {

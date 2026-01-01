@@ -561,7 +561,7 @@ function without<T> (a: T[], b: T[]): T[] {
   }, []);
 }
 
-export {
+export = {
   any,
   applyWhen,
   bindAll,
