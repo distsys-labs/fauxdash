@@ -188,8 +188,11 @@ function getArguments (fn: Function): string[] {
   if (!match) {
     return [];
   }
-  return filter(match[2].replace(/[) ]/g, '').split(','))
-    .map((x) => x.split('=')[0]);
+  return match[2]
+    .replace(/[) ]/g, '')
+    .split(',')
+    .map((x) => x.split('=')[0])
+    .filter(x => isEmpty(x) === false);
 }
 
 function getKeys (obj: AnyRecord | null | undefined): string[] {

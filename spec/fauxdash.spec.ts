@@ -150,6 +150,7 @@ describe('fauxdash', () => {
       expect(_.getArguments((a = 1) => {})).toEqual(['a']);
       expect(_.getArguments((a = 1, b = true) => {})).toEqual(['a', 'b']);
       expect(_.getArguments((a = 'hello', b = 2) => {})).toEqual(['a', 'b']);
+      expect(_.getArguments(() => {})).toEqual([]);
     });
 
     it('should parse function correctly', async () => {
@@ -180,6 +181,11 @@ describe('fauxdash', () => {
     it('should parse function correctly', async () => {
       await expect(_.parseFunction((a = 1) => {}))
         .partiallyEql({ name: undefined, arguments: ['a'] });
+    });
+
+    it('should parse argument-less functions', async () => {
+      await expect(_.parseFunction(() => {}))
+        .partiallyEql({ name: undefined, arguments: [] });
     });
 
     it('should memoize a function correctly', () => {

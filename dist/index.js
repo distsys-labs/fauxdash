@@ -1,53 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.any = any;
-exports.applyWhen = applyWhen;
-exports.bindAll = bindAll;
-exports.contains = contains;
-exports.clone = clone;
-exports.defaults = defaults;
-exports.each = each;
-exports.exists = exists;
-exports.find = find;
-exports.filter = filter;
-exports.flatten = flatten;
-exports.future = future;
-exports.getArguments = getArguments;
-exports.getObjectTag = getObjectTag;
-exports.has = has;
-exports.intersection = intersection;
-exports.isDate = isDate;
-exports.isEmpty = isEmpty;
-exports.isEqual = isEqual;
-exports.isFunction = isFunction;
-exports.isNumber = isNumber;
-exports.isObject = isObject;
-exports.isPlainObject = isPlainObject;
-exports.isPromisey = isPromisey;
-exports.isStub = isStub;
-exports.isString = isString;
-exports.last = last;
-exports.lift = lift;
-exports.map = map;
-exports.mapCall = mapCall;
-exports.matches = matches;
-exports.melter = melter;
-exports.memoize = memoize;
-exports.merge = merge;
-exports.omit = omit;
-exports.noop = noop;
-exports.parseFunction = parseFunction;
-exports.reduce = reduce;
-exports.sequence = sequence;
-exports.sortBy = sortBy;
-exports.transform = transform;
-exports.trim = trim;
-exports.trimString = trimString;
-exports.type = type;
-exports.uniq = uniq;
-exports.unique = unique;
-exports.values = values;
-exports.without = without;
 const FUNCTION_REGEX = /(function)?(\s[a-zA-Z0-9_]*\s*)?[(]?([^>)]*)[)]?\W*[{=>]*\W*([\s\S]+)?[};]{0,}/m;
 const ARGUMENT_REGEX = /^(function\s*\w*\s*)?[(]?([^{>]*)[)]?\s*(=>)?\s*[{]?/;
 const NYC_DEFAULT_REGEX = /[=]\s*[(][^)]+[)]/g;
@@ -220,8 +171,11 @@ function getArguments(fn) {
     if (!match) {
         return [];
     }
-    return filter(match[2].replace(/[) ]/g, '').split(','))
-        .map((x) => x.split('=')[0]);
+    return match[2]
+        .replace(/[) ]/g, '')
+        .split(',')
+        .map((x) => x.split('=')[0])
+        .filter(x => isEmpty(x) === false);
 }
 function getKeys(obj) {
     if (obj) {
@@ -570,3 +524,53 @@ function without(a, b) {
         return acc;
     }, []);
 }
+module.exports = {
+    any,
+    applyWhen,
+    bindAll,
+    contains,
+    clone,
+    defaults,
+    each,
+    exists,
+    find,
+    filter,
+    flatten,
+    future,
+    getArguments,
+    getObjectTag,
+    has,
+    intersection,
+    isDate,
+    isEmpty,
+    isEqual,
+    isFunction,
+    isNumber,
+    isObject,
+    isPlainObject,
+    isPromisey,
+    isStub,
+    isString,
+    last,
+    lift,
+    map,
+    mapCall,
+    matches,
+    melter,
+    memoize,
+    merge,
+    omit,
+    noop,
+    parseFunction,
+    reduce,
+    sequence,
+    sortBy,
+    transform,
+    trim,
+    trimString,
+    type,
+    uniq,
+    unique,
+    values,
+    without
+};

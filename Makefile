@@ -10,3 +10,5 @@ build:
 
 release: build
 	npm run release
+	git push origin main --follow-tags
+	npm publish
