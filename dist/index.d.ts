@@ -105,4 +105,4 @@ declare const _default: {
     values: typeof values;
     without: typeof without;
 };
-export = _default;
+export default _default;

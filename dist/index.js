@@ -1,4 +1,3 @@
-"use strict";
 const FUNCTION_REGEX = /(function)?(\s[a-zA-Z0-9_]*\s*)?[(]?([^>)]*)[)]?\W*[{=>]*\W*([\s\S]+)?[};]{0,}/m;
 const ARGUMENT_REGEX = /^(function\s*\w*\s*)?[(]?([^{>]*)[)]?\s*(=>)?\s*[{]?/;
 const NYC_DEFAULT_REGEX = /[=]\s*[(][^)]+[)]/g;
@@ -524,7 +523,7 @@ function without(a, b) {
         return acc;
     }, []);
 }
-module.exports = {
+export default {
     any,
     applyWhen,
     bindAll,

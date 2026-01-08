@@ -4,7 +4,7 @@
   "description": "I don't know it's not lodash",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "semistandard \"src/**/*.ts\" \"vitest.config.ts\"",
@@ -50,7 +50,7 @@
     "CHANGELOG.md"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",
