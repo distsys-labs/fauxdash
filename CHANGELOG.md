@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.5](https://github.com/deftly/fauxdash/compare/v1.8.4...v1.8.5) (2026-01-08)
+
+
+### Bug Fixes
+
+* change to module type and esnext target ([cac7388](https://github.com/deftly/fauxdash/commit/cac7388b4abc2c35b45798dc6ecb9a083ae6ce37))
+
 ### [1.8.4](https://github.com/deftly/fauxdash/compare/v1.8.3...v1.8.4) (2026-01-04)
 
 ### [1.8.3](https://github.com/deftly/fauxdash/compare/v1.8.2...v1.8.3) (2026-01-01)
