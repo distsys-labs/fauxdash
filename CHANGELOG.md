@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.6](https://github.com/deftly/fauxdash/compare/v1.8.5...v1.8.6) (2026-01-30)
+
+
+### Bug Fixes
+
+* use ESM import condition in package exports ([ee4e1bc](https://github.com/deftly/fauxdash/commit/ee4e1bcfdd8e0024c062792e521c0e8bf2659c7d))
+
 ### [1.8.5](https://github.com/deftly/fauxdash/compare/v1.8.4...v1.8.5) (2026-01-08)
 
 
