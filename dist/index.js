@@ -45,6 +45,31 @@ const UINT16_TAG = '[object Uint16Array]';
 const UINT32_TAG = '[object Uint32Array]';
 const NOT_AN_OBJECT = '';
 const NULL_PROTOTYPE = Object.getPrototypeOf({});
+// Keys that must never be copied by the object-manipulation functions below
+// (mergeTwo, clone, defaults, melter, omit, transform) - copying any of these
+// from an attacker-controlled source (e.g. JSON.parse'd input, where
+// "__proto__" becomes a real own property rather than triggering the
+// special object-literal prototype-assignment behavior) can reassign or
+// mutate an object's prototype, up to and including Object.prototype
+// itself when the recursive merge/clone walk reaches it via a "__proto__"
+// property access. Silently skipping these keys matches how modern
+// lodash handles the same class of input.
+const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+function isUnsafeKey(key) {
+    return UNSAFE_KEYS.has(key);
+}
+// clone/mergeTwo need the real constructor of `obj` to build a same-typed
+// target. Reading `obj.constructor` directly is unsafe for the same reason
+// as the key-copy loops above: an attacker-controlled source object can
+// carry its own "constructor" own-property (e.g. from JSON.parse) that
+// shadows the real, inherited constructor reference and is not itself a
+// constructor function, causing `new obj.constructor()` to throw (or, with
+// a crafted own "constructor" that IS callable, to run attacker-controlled
+// code). Walking the actual prototype chain instead is unaffected by any
+// own property named "constructor".
+function getRealConstructor(obj) {
+    return Object.getPrototypeOf(obj)?.constructor ?? Object;
+}
 function any(list, predicate = (y) => Boolean(y)) {
     let met = false;
     for (let i = 0; i < list.length; i++) {
@@ -90,9 +115,9 @@ function clone(source, target) {
         tag === FUNC_TAG || tag === DATE_TAG || tag === REGEX_TAG ||
         tag === GEN_TAG || tag === ASYNC_TAG || tag === PROXY_TAG ||
         tag === PROMISE_TAG) {
-        return new source.constructor(source);
+        return new (getRealConstructor(source))(source);
     }
-    const newTarget = (target || new source.constructor());
+    const newTarget = (target || new (getRealConstructor(source))());
     const cast = source;
     if (newTarget === undefined || newTarget === null) {
         throw new Error('Cannot clone to undefined or null target');
@@ -101,6 +126,9 @@ function clone(source, target) {
         throw new Error('Cannot clone from undefined or null source');
     }
     for (const key in source) {
+        if (isUnsafeKey(key)) {
+            continue;
+        }
         newTarget[key] = typeof newTarget[key] === 'undefined' ? clone(cast[key], null) : newTarget[key];
     }
     return newTarget;
@@ -119,6 +147,9 @@ function defaults(target, ...sources) {
         }
         for (const key in source) {
             const k = key;
+            if (isUnsafeKey(k)) {
+                continue;
+            }
             if (!target[k]) {
                 target[k] = cast[k];
             }
@@ -313,6 +344,9 @@ function melter(target, ...args) {
     }
     args.forEach((o) => {
         each(o, (p, k) => {
+            if (isUnsafeKey(k)) {
+                return;
+            }
             if (typeof p === 'function') {
                 merged[k] = p.bind(merged);
             }
@@ -363,9 +397,9 @@ function mergeTwo(source, target) {
         tag === FUNC_TAG || tag === DATE_TAG || tag === REGEX_TAG ||
         tag === GEN_TAG || tag === ASYNC_TAG || tag === PROXY_TAG ||
         tag === PROMISE_TAG) {
-        return new source.constructor(source);
+        return new (getRealConstructor(source))(source);
     }
-    const newTarget = (target || new source.constructor());
+    const newTarget = (target || new (getRealConstructor(source))());
     if (newTarget === undefined || newTarget === null) {
         throw new Error('Cannot merge to undefined or null target');
     }
@@ -374,6 +408,9 @@ function mergeTwo(source, target) {
         throw new Error('Cannot merge from undefined or null source');
     }
     for (const key in source) {
+        if (isUnsafeKey(key)) {
+            continue;
+        }
         newTarget[key] = typeof newTarget[key] === 'undefined'
             ? mergeTwo(cast[key], null)
             : mergeTwo(cast[key], newTarget[key]);
@@ -386,7 +423,7 @@ function omit(obj, ...keys) {
         if (o === undefined || o === null) {
             return o;
         }
-        if (!contains(list, k)) {
+        if (!contains(list, k) && !isUnsafeKey(k)) {
             o[k] = v;
         }
         return o;
@@ -470,8 +507,9 @@ function transform(obj, aliases, ...omitKeys) {
         if (o === undefined || o === null) {
             return o;
         }
-        if (!contains(list, k)) {
-            o[aliases[k] || k] = v;
+        const targetKey = aliases[k] || k;
+        if (!contains(list, k) && !isUnsafeKey(k) && !isUnsafeKey(targetKey)) {
+            o[targetKey] = v;
         }
         return o;
     }, {});
