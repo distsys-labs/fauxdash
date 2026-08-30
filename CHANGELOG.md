@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/distsys-labs/fauxdash/compare/fauxdash-v1.8.6...fauxdash-v1.9.0) (2026-08-30)
+
+
+### Features
+
+* add additional methods, improve resilience during coverage testing ([235d05a](https://github.com/distsys-labs/fauxdash/commit/235d05ab95dd80f7803f0ad1cad26bef18b15f9e))
+* add bindAll ([49db2e7](https://github.com/distsys-labs/fauxdash/commit/49db2e78f9465e3e34952845bd8eccb046d5d287))
+* add deep merge ([d4c7a9f](https://github.com/distsys-labs/fauxdash/commit/d4c7a9f54e16a61bb410ddaca4b8ba8fff257efa))
+* add futures ([7a33ea9](https://github.com/distsys-labs/fauxdash/commit/7a33ea906fd7bc1497c67f8885bfd703d53e1a02))
+* add melter ([6c5c325](https://github.com/distsys-labs/fauxdash/commit/6c5c3253ded3c4b282bb8b7e7f8512a4a6fc6e26))
+* add memoization ([d4da42d](https://github.com/distsys-labs/fauxdash/commit/d4da42d9a5b1ae6c26b5d3a7e34ef0e3d00db181))
+* add uniq, instersection, without, isEqual, matches, map, reduce, each (for object iteration) and noop ([a870f9e](https://github.com/distsys-labs/fauxdash/commit/a870f9e1e640e4b07d4c4c709dfb39069ca54646))
+* initial commit ([d241a08](https://github.com/distsys-labs/fauxdash/commit/d241a082578b79c853175beb5a77d5b207198bbd))
+* rewrite as TypeScript with vitest for testing ([b1efbe3](https://github.com/distsys-labs/fauxdash/commit/b1efbe3dd8f393de0df50c0a7be2490e2c29d234))
+
+
+### Bug Fixes
+
+* add index args to object iterators ([ea5f165](https://github.com/distsys-labs/fauxdash/commit/ea5f1656185bd20bd331c8bd4526ed0eac048fa4))
+* change to module type and esnext target ([cac7388](https://github.com/distsys-labs/fauxdash/commit/cac7388b4abc2c35b45798dc6ecb9a083ae6ce37))
+* cleanup audit warnings ([e081b2f](https://github.com/distsys-labs/fauxdash/commit/e081b2fe19d27a5ac539e25cdefcbc7df5639ab4))
+* correct bad export style ([83e48da](https://github.com/distsys-labs/fauxdash/commit/83e48da07b002a73c5a901770783e283450572d7))
+* correct mapCall implementation ([b61eea9](https://github.com/distsys-labs/fauxdash/commit/b61eea981ddf5a032f4db62cbff2d6261648528c))
+* correct use of mapCall to default to passing an object when no properties were found ([c32bac8](https://github.com/distsys-labs/fauxdash/commit/c32bac81924189cb7a8ef58af34ba0b68ab5fb3c))
+* correctly parse arguments when default values are included ([1888838](https://github.com/distsys-labs/fauxdash/commit/1888838d7c5cc21597646b1a0c590bad20a17ebd))
+* guard against prototype pollution in object-manipulation helpers ([216228d](https://github.com/distsys-labs/fauxdash/commit/216228d1805546f8271f77166983741a7963e874))
+* improve calls that iterate instance properties by including first prototype as well ([1f8ca9d](https://github.com/distsys-labs/fauxdash/commit/1f8ca9d8cde22f4f45d31c575a935084acffdd5a))
+* improve handling of bindAll to work with objects that have no prototype ([16db7e6](https://github.com/distsys-labs/fauxdash/commit/16db7e60203ae6fe1bba5f907f55226579f6aa32))
+* prototype pollution guard + release-please/trusted publishing ([90ee9e2](https://github.com/distsys-labs/fauxdash/commit/90ee9e2a68b3ba7358c41181b49621a649904d42))
+* small fix to behavior in mapCall and added simple API summary ([4cd7636](https://github.com/distsys-labs/fauxdash/commit/4cd76368459afa46dcc5bca8e2b91731e0714174))
+* use ESM import condition in package exports ([ee4e1bc](https://github.com/distsys-labs/fauxdash/commit/ee4e1bcfdd8e0024c062792e521c0e8bf2659c7d))
+
 ### [1.8.6](https://github.com/deftly/fauxdash/compare/v1.8.5...v1.8.6) (2026-01-30)
 
 
