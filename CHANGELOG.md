@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.1](https://github.com/distsys-labs/fauxdash/compare/fauxdash-v1.9.0...fauxdash-v1.9.1) (2026-08-30)
+
+
+### Bug Fixes
+
+* point repository/bugs/homepage at distsys-labs, not the retired deftly org ([0c088fc](https://github.com/distsys-labs/fauxdash/commit/0c088fcd69836a5dcb79b2b206e4fa08c8ad2939))
+* publish workflow npm version + retired org references ([fb65ec9](https://github.com/distsys-labs/fauxdash/commit/fb65ec9569a3ce3f0f65c6163a12aef8aad3bf03))
+* upgrade npm before publish so OIDC trusted publishing actually authenticates ([b5f46c4](https://github.com/distsys-labs/fauxdash/commit/b5f46c4ae8f1de6cddd1dce185aa286e612660e9))
+
 ## [1.9.0](https://github.com/distsys-labs/fauxdash/compare/fauxdash-v1.8.6...fauxdash-v1.9.0) (2026-08-30)
 
 
