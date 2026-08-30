@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import _ from '../src/index';
 
 describe('fauxdash', () => {
@@ -554,6 +554,52 @@ describe('fauxdash', () => {
       };
       const d = _.melter({}, a, b, c);
       expect(d.all()).toEqual([1, 2, 3]);
+    });
+
+    describe('prototype pollution guards', () => {
+      // JSON.parse creates a genuine own property literally named
+      // "__proto__" (unlike object-literal syntax, which treats it as
+      // special prototype-assignment syntax instead) - this is the
+      // standard shape of a prototype-pollution payload arriving from
+      // untrusted input such as a request body.
+      const payload = JSON.parse('{"__proto__":{"polluted":true},"constructor":{"polluted":true},"prototype":{"polluted":true},"safe":1}');
+
+      afterEach(() => {
+        delete (Object.prototype as any).polluted;
+        delete (Array.prototype as any).polluted;
+      });
+
+      it('should not pollute Object.prototype via clone', () => {
+        const result = _.clone(payload);
+        expect((Object.prototype as any).polluted).toBeUndefined();
+        expect((result as any).safe).toBe(1);
+      });
+
+      it('should not pollute Object.prototype via defaults', () => {
+        _.defaults({}, payload);
+        expect((Object.prototype as any).polluted).toBeUndefined();
+      });
+
+      it('should not pollute Object.prototype via merge', () => {
+        _.merge({} as any, payload as any);
+        expect((Object.prototype as any).polluted).toBeUndefined();
+      });
+
+      it('should not pollute Object.prototype via melter', () => {
+        _.melter({}, payload);
+        expect((Object.prototype as any).polluted).toBeUndefined();
+      });
+
+      it('should not pollute Object.prototype via omit', () => {
+        const result = _.omit(payload, 'safe');
+        expect((Object.prototype as any).polluted).toBeUndefined();
+        expect(result).not.toHaveProperty('__proto__', { polluted: true });
+      });
+
+      it('should not pollute Object.prototype via transform', () => {
+        _.transform(payload, {});
+        expect((Object.prototype as any).polluted).toBeUndefined();
+      });
     });
   });
 

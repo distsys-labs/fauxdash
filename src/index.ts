@@ -50,6 +50,33 @@ const NULL_PROTOTYPE = Object.getPrototypeOf({});
 
 type AnyRecord = Record<string, any> | null | undefined;
 
+// Keys that must never be copied by the object-manipulation functions below
+// (mergeTwo, clone, defaults, melter, omit, transform) - copying any of these
+// from an attacker-controlled source (e.g. JSON.parse'd input, where
+// "__proto__" becomes a real own property rather than triggering the
+// special object-literal prototype-assignment behavior) can reassign or
+// mutate an object's prototype, up to and including Object.prototype
+// itself when the recursive merge/clone walk reaches it via a "__proto__"
+// property access. Silently skipping these keys matches how modern
+// lodash handles the same class of input.
+const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+function isUnsafeKey (key: string): boolean {
+  return UNSAFE_KEYS.has(key);
+}
+
+// clone/mergeTwo need the real constructor of `obj` to build a same-typed
+// target. Reading `obj.constructor` directly is unsafe for the same reason
+// as the key-copy loops above: an attacker-controlled source object can
+// carry its own "constructor" own-property (e.g. from JSON.parse) that
+// shadows the real, inherited constructor reference and is not itself a
+// constructor function, causing `new obj.constructor()` to throw (or, with
+// a crafted own "constructor" that IS callable, to run attacker-controlled
+// code). Walking the actual prototype chain instead is unaffected by any
+// own property named "constructor".
+function getRealConstructor (obj: any): new (...args: any[]) => any {
+  return Object.getPrototypeOf(obj)?.constructor ?? Object;
+}
+
 function any<T> (list: T[], predicate: (value: T) => boolean = (y) => Boolean(y)): boolean {
   let met = false;
   for (let i = 0; i < list.length; i++) {
@@ -95,10 +122,10 @@ function clone<T> (source: T, target?: T): T {
             tag === FUNC_TAG || tag === DATE_TAG || tag === REGEX_TAG ||
             tag === GEN_TAG || tag === ASYNC_TAG || tag === PROXY_TAG ||
             tag === PROMISE_TAG) {
-    return new (source as any).constructor(source);
+    return new (getRealConstructor(source))(source);
   }
 
-  const newTarget = (target || new (source as any).constructor()) as AnyRecord;
+  const newTarget = (target || new (getRealConstructor(source))()) as AnyRecord;
   const cast = source as AnyRecord;
   if (newTarget === undefined || newTarget === null) {
     throw new Error('Cannot clone to undefined or null target');
@@ -107,6 +134,9 @@ function clone<T> (source: T, target?: T): T {
     throw new Error('Cannot clone from undefined or null source');
   }
   for (const key in source as AnyRecord) {
+    if (isUnsafeKey(key)) {
+      continue;
+    }
     newTarget[key] = typeof newTarget[key] === 'undefined' ? clone(cast[key], null as any) : newTarget[key];
   }
   return newTarget as T;
@@ -128,6 +158,9 @@ function defaults<T extends AnyRecord> (target: T, ...sources: Array<Partial<T>>
 
     for (const key in source) {
       const k = key as string;
+      if (isUnsafeKey(k)) {
+        continue;
+      }
       if (!target[k]) {
         target[k] = cast[k] as T[keyof T];
       }
@@ -346,6 +379,9 @@ function melter<T extends AnyRecord> (target: T | null | undefined, ...args: Any
   }
   args.forEach((o) => {
     each(o, (p, k) => {
+      if (isUnsafeKey(k)) {
+        return;
+      }
       if (typeof p === 'function') {
         merged[k] = p.bind(merged);
       } else {
@@ -394,10 +430,10 @@ function mergeTwo (source: AnyRecord | null | undefined, target: AnyRecord | nul
             tag === FUNC_TAG || tag === DATE_TAG || tag === REGEX_TAG ||
             tag === GEN_TAG || tag === ASYNC_TAG || tag === PROXY_TAG ||
             tag === PROMISE_TAG) {
-    return new (source as any).constructor(source);
+    return new (getRealConstructor(source))(source);
   }
 
-  const newTarget = (target || new (source as any).constructor()) as AnyRecord;
+  const newTarget = (target || new (getRealConstructor(source))()) as AnyRecord;
   if (newTarget === undefined || newTarget === null) {
     throw new Error('Cannot merge to undefined or null target');
   }
@@ -406,6 +442,9 @@ function mergeTwo (source: AnyRecord | null | undefined, target: AnyRecord | nul
     throw new Error('Cannot merge from undefined or null source');
   }
   for (const key in source) {
+    if (isUnsafeKey(key)) {
+      continue;
+    }
     newTarget[key] = typeof newTarget[key] === 'undefined'
       ? mergeTwo(cast[key], null as any)
       : mergeTwo(cast[key], newTarget[key]);
@@ -419,7 +458,7 @@ function omit<T extends AnyRecord> (obj: T, ...keys: Array<string | string[]>): 
     if (o === undefined || o === null) {
       return o;
     }
-    if (!contains(list, k)) {
+    if (!contains(list, k) && !isUnsafeKey(k)) {
       o[k] = v;
     }
     return o;
@@ -503,8 +542,9 @@ function transform<T extends AnyRecord> (obj: T, aliases: Record<string, string>
     if (o === undefined || o === null) {
       return o;
     }
-    if (!contains(list, k)) {
-      o[aliases[k] || k] = v;
+    const targetKey = aliases[k] || k;
+    if (!contains(list, k) && !isUnsafeKey(k) && !isUnsafeKey(targetKey)) {
+      o[targetKey] = v;
     }
     return o;
   }, {});

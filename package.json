@@ -11,8 +11,7 @@
     "lint-fix": "semistandard --fix \"src/**/*.ts\" \"vitest.config.ts\"",
     "pretest": "npm run lint",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "release": "standard-version"
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",
@@ -59,7 +58,6 @@
     "@vitest/coverage-v8": "^4.0.16",
     "eslint-import-resolver-node": "^0.3.9",
     "semistandard": "^17.0.0",
-    "standard-version": "^9.5.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.16"
   }
