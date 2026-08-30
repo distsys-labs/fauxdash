@@ -15,14 +15,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/deftly/fauxdash.git"
+    "url": "git+https://github.com/distsys-labs/fauxdash.git"
   },
   "author": "Alex Robson",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/deftly/fauxdash/issues"
+    "url": "https://github.com/distsys-labs/fauxdash/issues"
   },
-  "homepage": "https://github.com/deftly/fauxdash#readme",
+  "homepage": "https://github.com/distsys-labs/fauxdash#readme",
   "semistandard": {
     "parser": "@typescript-eslint/parser",
     "plugins": [
